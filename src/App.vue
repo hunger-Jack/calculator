@@ -1,10 +1,11 @@
 <template>
   <div id="app">
     <section class="calc-display">
+      <div>{{symble}}</div>
       <div class="content">
         <div>{{lastMsg}}</div>
       </div>
-      <input class="result" v-model="msg">
+      <div class="result">{{numberLegnth}}</div>
     </section>
     <section class="calc-input">
       <ul>
@@ -29,7 +30,9 @@
         lastMsg: '0',
         total: 0,
         isFirstPress: true,
+        isBeginInputNum: false,
         result: 0,
+        symble: '',
         items: {
           row1: [{
               value: 'C',
@@ -110,12 +113,12 @@
           row5: [{
               value: '00',
               idx: 0,
-              className: 'dot'
+              className: 'number00'
             },
             {
               value: 0,
               idx: 1,
-              className: 'dot'
+              className: 'number0'
             }, {
               value: '.',
               idx: 2,
@@ -129,46 +132,91 @@
         }
       }
     },
+    computed: {
+      numberLegnth() {
+        let message = this.msg
+        let arr = String(this.msg).split('')
+        for (let i = 0; i < arr.length; i++) {
+          if (i === 3 || i === 7) {
+            arr.splice(1, 0, ',')
+          }
+          if (i > 4 && i !== 7) {
+            arr.splice(i - 4, 1)
+            arr.splice(i - 3, 0, ',')
+          }
+          if (i > 8) {
+            arr.splice(i - 8, 1)
+            arr.splice(i - 7, 0, ',')
+          }
+        }
+        return arr.splice(0, 11).join('')
+      }
+    },
     methods: {
       press(key) {
         let val = key.value
         let className = key.className
-        if (this.isFirstPress) {
-          if (val === '0' && val.length === 1) {
-            this.msg = '0'
-            return
-          }
-          if (typeof val !== 'number' && val.length === 1) {
-            this.msg = '0'
-            return
-          }
-          if(val === '+/-') {
-            this.msg = '0'
-            return
-          }
-          this.msg = ''
-        }
-        this.isFirstPress = false
-        if(className === 'equal') {
-          this.result = eval(this.msg)
+        if (className === 'equal') { //按等于号按钮处理一些数据
+          console.log(this.msg + this.numberLegnth)
+          this.result = eval(this.lastMsg + this.numberLegnth)
           this.msg += val
-           this.lastMsg = this.msg
-           this.msg = this.result
+          this.lastMsg = this.lastMsg + this.numberLegnth
+          this.msg = this.result
           return
         }
-        this.msg += val
+        if (className === 'clear') { //按清除按钮重置数据
+          this.msg = '0'
+          this.lastMsg = '0'
+          this.isFirstPress = true
+          return
+        }
+        if (this.numberLegnth.length === 11) { //限制最大输入长度
+          return
+        }
+        if (this.lastMsg.length > 1 && this.isFirstPress) {
+          this.msg = ''
+        }
+        if (this.isFirstPress) { //第一次输入不能输入符号或者0
+          if (((typeof val) !== 'number' || val === '00' || val === 0)) {
+            this.msg = '0'
+            return
+          } else {
+            this.isFirstPress = false
+            this.msg = String(val)
+          }
+        }else {
+             this.msg += val
+        }
+        if (typeof val !== 'number' || key.value === '00') { //第二次输入开始不能连续多次输入符号
+        let arr = this.msg.split('')
+          this.symble = val
+          arr.splice(arr.length-1,1)
+          console.log(arr)
+          this.msg = arr.join('')
+          this.lastMsg = this.numberLegnth + val
+          return
+        } else {
+
+        }
+       
       }
     },
-    created() {}
+    created() {},
+    filters: {
+      // numberLegnth(val) {
+      //   return val.split('').splice(0,9).join('')
+      // }
+    }
   }
 
 </script>
 
 <style <style lang="less">
-body {
-  height: 100vh;
-  background-color: #f7f6f7;
-}
+  body {
+    height: 100vh;
+    background-color: white;
+  }
+
   #app {
     height: 100vh;
     padding: 16px 24px 8px 24px;
@@ -198,12 +246,13 @@ body {
       .result {
         display: inline-block;
         padding: 8px 0;
-        height: 46%;
+        height: 36%;
         text-align: right;
-        font-size: 59px;
+        font-size: 55px;
         overflow: hidden;
         outline: none;
         color: #414141;
+        word-break: break-all;
       }
     }
     .calc-input {
@@ -223,8 +272,8 @@ body {
             justify-content: space-between;
             li {
               flex-flow: 1;
-              width: 48px;
-              height: 48px;
+              width: 40px;
+              height: 40px;
               text-align: center;
               line-height: 48px;
             }
@@ -233,13 +282,22 @@ body {
       }
     }
   }
-  .plus,.minus,.divide,.multiply {
+
+  .plus,
+  .minus,
+  .divide,
+  .multiply {
     color: #f06e6e;
   }
+
   .equal {
     color: #ffffff;
     background-color: #f06e6e;
     border-radius: 50%;
     box-shadow: 2px 3px 12px 1px #e5a2a0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
+
 </style>
