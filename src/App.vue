@@ -30,9 +30,11 @@
         lastMsg: '0',
         total: 0,
         isFirstPress: true,
-        isBeginInputNum: false,
+        isBeginInputNum: true,
         result: 0,
         symble: '',
+        isStart: false,
+        lastArr: [],
         items: {
           row1: [{
               value: 'C',
@@ -40,9 +42,9 @@
               className: 'clear'
             },
             {
-              value: '+/-',
+              value: 'DEL',
               idx: 0,
-              className: 'posOrneg'
+              className: 'delete'
             }, {
               value: '%',
               idx: 0,
@@ -136,18 +138,27 @@
       numberLegnth() {
         let message = this.msg
         let arr = String(this.msg).split('')
+        if (this.isStart) {
+          if (arr.indexOf('0') === 0) {
+            arr.splice(0, 1)
+          }
+          this.isStart  = false
+        }
         for (let i = 0; i < arr.length; i++) {
-          if (i === 3 || i === 7) {
-            arr.splice(1, 0, ',')
+          if (arr.indexOf('.') === -1) {
+            if (i === 3 || i === 7) {
+              arr.splice(1, 0, ',')
+            }
+            if (i > 4 && i !== 7) {
+              arr.splice(i - 4, 1)
+              arr.splice(i - 3, 0, ',')
+            }
+            if (i > 8) {
+              arr.splice(i - 8, 1)
+              arr.splice(i - 7, 0, ',')
+            }
           }
-          if (i > 4 && i !== 7) {
-            arr.splice(i - 4, 1)
-            arr.splice(i - 3, 0, ',')
-          }
-          if (i > 8) {
-            arr.splice(i - 8, 1)
-            arr.splice(i - 7, 0, ',')
-          }
+
         }
         return arr.splice(0, 11).join('')
       }
@@ -156,57 +167,39 @@
       press(key) {
         let val = key.value
         let className = key.className
-        if (className === 'equal') { //按等于号按钮处理一些数据
-          console.log(this.msg + this.numberLegnth)
-          this.result = eval(this.lastMsg + this.numberLegnth)
-          this.msg += val
-          this.lastMsg = this.lastMsg + this.numberLegnth
-          this.msg = this.result
-          return
-        }
-        if (className === 'clear') { //按清除按钮重置数据
-          this.msg = '0'
-          this.lastMsg = '0'
-          this.isFirstPress = true
-          return
-        }
         if (this.numberLegnth.length === 11) { //限制最大输入长度
           return
         }
-        if (this.lastMsg.length > 1 && this.isFirstPress) {
-          this.msg = ''
-        }
-        if (this.isFirstPress) { //第一次输入不能输入符号或者0
-          if (((typeof val) !== 'number' || val === '00' || val === 0)) {
-            this.msg = '0'
-            return
-          } else {
-            this.isFirstPress = false
-            this.msg = String(val)
-          }
-        }else {
-             this.msg += val
-        }
-        if (typeof val !== 'number' || key.value === '00') { //第二次输入开始不能连续多次输入符号
-        let arr = this.msg.split('')
-          this.symble = val
-          arr.splice(arr.length-1,1)
-          console.log(arr)
-          this.msg = arr.join('')
-          this.lastMsg = this.numberLegnth + val
-          return
-        } else {
 
+        if (!isNaN(val) || val === '.') { //输入的是数字或者小数点的情况
+          this.isStart = true
+          if (String(this.msg).indexOf('.') !== -1) { //输入内容已经有小数点
+            if (val !== '.') { //如果输入不是点的情况，否则就没有输出
+              this.msg += val
+            }
+          } else { //没有点的情况，直接拼接字符串
+            this.msg += val
+          }
+        } else { //输入符号的情况
+          if (val !== '=') { //是符号但不是等号的情况
+            this.lastMsg = this.numberLegnth + val //储存输入的数字和符号
+            this.lastArr[this.lastArr.length] = this.lastMsg
+            if (this.lastArr.length > 1) {//输入符号的时候也可以进行计算
+              this.result = eval(this.lastArr[0] + this.numberLegnth)
+              this.msg = String(this.result)
+              this.lastArr   = []
+            } else {
+              this.msg = '' //清屏
+            }
+
+          } else { //是等号的情况
+            this.result = eval(this.lastMsg + this.numberLegnth)
+            this.msg = String(this.result)
+          }
         }
-       
       }
     },
     created() {},
-    filters: {
-      // numberLegnth(val) {
-      //   return val.split('').splice(0,9).join('')
-      // }
-    }
   }
 
 </script>
