@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="theme-one" v-finger:swipe="swipe" ref="whole">
     <section class="calc-display">
       <div>{{symble}}</div>
       <div class="content">
@@ -35,6 +35,8 @@
         symble: '',
         isStart: false,
         lastArr: [],
+        classNameArr: ['theme-one', 'theme-two', 'theme-three', 'theme-four'],
+        count: 0,
         items: {
           row1: [{
               value: 'C',
@@ -142,7 +144,7 @@
           if (arr.indexOf('0') === 0) {
             arr.splice(0, 1)
           }
-          this.isStart  = false
+          this.isStart = false
         }
         for (let i = 0; i < arr.length; i++) {
           if (arr.indexOf('.') === -1) {
@@ -184,10 +186,10 @@
           if (val !== '=') { //是符号但不是等号的情况
             this.lastMsg = this.numberLegnth + val //储存输入的数字和符号
             this.lastArr[this.lastArr.length] = this.lastMsg
-            if (this.lastArr.length > 1) {//输入符号的时候也可以进行计算
+            if (this.lastArr.length > 1) { //输入符号的时候也可以进行计算
               this.result = eval(this.lastArr[0] + this.numberLegnth)
               this.msg = String(this.result)
-              this.lastArr   = []
+              this.lastArr = []
             } else {
               this.msg = '' //清屏
             }
@@ -197,6 +199,18 @@
             this.msg = String(this.result)
           }
         }
+      },
+      swipe(e) {
+        let curClassName = this.$refs.whole.className
+        console.log(this.count,this.classNameArr.length)
+        if (this.count === this.classNameArr.length-1) {
+          this.count = 0
+        }
+        this.count++
+          if (e.direction === 'Left' || e.direction === 'Right') {
+            this.$refs.whole.classList.remove(curClassName)
+            this.$refs.whole.classList.add(this.classNameArr[this.count])
+          }
       }
     },
     created() {},
@@ -205,15 +219,10 @@
 </script>
 
 <style <style lang="less">
-  body {
-    height: 100vh;
-    background-color: white;
-  }
-
-  #app {
+  .theme-one {
     height: 100vh;
     padding: 16px 24px 8px 24px;
-    background-color: #ffffff;
+    background-color: white;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -229,7 +238,7 @@
         text-align: right;
         word-break: break-all;
         font-size: 24px;
-        color: #aaa;
+        color: #757575;
         div {
           position: absolute;
           right: 0;
@@ -241,7 +250,7 @@
         padding: 8px 0;
         height: 36%;
         text-align: right;
-        font-size: 55px;
+        font-size: 52px;
         overflow: hidden;
         outline: none;
         color: #414141;
@@ -257,7 +266,7 @@
         align-items: space-around;
         justify-content: space-around;
         font-size: 22px;
-        color: #aaa;
+        color: #757575;
         li {
           ul {
             display: flex;
@@ -274,23 +283,264 @@
         }
       }
     }
+    .plus,
+    .minus,
+    .divide,
+    .multiply {
+      color: #f06e6e;
+    }
+    .equal {
+      color: #ffffff;
+      background-color: #f06e6e;
+      border-radius: 50%;
+      box-shadow: 1px 3px 11px 0px #e5a2a0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
-  .plus,
-  .minus,
-  .divide,
-  .multiply {
-    color: #f06e6e;
-  }
-
-  .equal {
-    color: #ffffff;
-    background-color: #f06e6e;
-    border-radius: 50%;
-    box-shadow: 2px 3px 12px 1px #e5a2a0;
+  .theme-two {
+    height: 100vh;
+    padding: 16px 24px 8px 24px;
+    background-color: #414141;
+    width: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    border-radius: 6px;
+    .calc-display {
+      border-bottom: 1px solid #eee;
+      height: 40%;
+      display: flex;
+      flex-direction: column;
+      .content {
+        position: relative;
+        flex-grow: 1;
+        text-align: right;
+        word-break: break-all;
+        font-size: 24px;
+        color: #757575;
+        div {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        }
+      }
+      .result {
+        display: inline-block;
+        padding: 8px 0;
+        height: 36%;
+        text-align: right;
+        font-size: 52px;
+        overflow: hidden;
+        outline: none;
+        color: #fff;
+        word-break: break-all;
+      }
+    }
+    .calc-input {
+      height: 60%;
+      ul {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: space-around;
+        justify-content: space-around;
+        font-size: 22px;
+        color: #757575;
+        li {
+          ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            li {
+              flex-flow: 1;
+              width: 40px;
+              height: 40px;
+              text-align: center;
+              line-height: 48px;
+            }
+          }
+        }
+      }
+    }
+    .plus,
+    .minus,
+    .divide,
+    .multiply {
+      color: #f06e6e;
+    }
+    .equal {
+      color: #ffffff;
+      background-color: #f06e6e;
+      border-radius: 50%;
+      box-shadow: 1px 3px 11px 0px #e5a2a0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .theme-three {
+    height: 100vh;
+    padding: 16px 24px 8px 24px;
+    background-color: #f06e6e;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px;
+    .calc-display {
+      border-bottom: 1px solid #eee;
+      height: 40%;
+      display: flex;
+      flex-direction: column;
+      .content {
+        position: relative;
+        flex-grow: 1;
+        text-align: right;
+        word-break: break-all;
+        font-size: 24px;
+        color: #757575;
+        div {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        }
+      }
+      .result {
+        display: inline-block;
+        padding: 8px 0;
+        height: 36%;
+        text-align: right;
+        font-size: 52px;
+        overflow: hidden;
+        outline: none;
+        color: white;
+        word-break: break-all;
+      }
+    }
+    .calc-input {
+      height: 60%;
+      ul {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: space-around;
+        justify-content: space-around;
+        font-size: 22px;
+        color: #757575;
+        li {
+          ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            li {
+              flex-flow: 1;
+              width: 40px;
+              height: 40px;
+              text-align: center;
+              line-height: 48px;
+            }
+          }
+        }
+      }
+    }
+    .plus,
+    .minus,
+    .divide,
+    .multiply {
+      color: #414141;
+    }
+    .equal {
+      color: #e5a2a0;
+      background-color: #ffffff;
+      border-radius: 50%;
+      box-shadow: 1px 3px 11px 0px #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .theme-four {
+    height: 100vh;
+    padding: 16px 24px 8px 24px;
+    background-color: #b8e986;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px;
+    .calc-display {
+      border-bottom: 1px solid #eee;
+      height: 40%;
+      display: flex;
+      flex-direction: column;
+      .content {
+        position: relative;
+        flex-grow: 1;
+        text-align: right;
+        word-break: break-all;
+        font-size: 24px;
+        color: #757575;
+        div {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        }
+      }
+      .result {
+        display: inline-block;
+        padding: 8px 0;
+        height: 36%;
+        text-align: right;
+        font-size: 52px;
+        overflow: hidden;
+        outline: none;
+        color: #414141;
+        word-break: break-all;
+      }
+    }
+    .calc-input {
+      height: 60%;
+      ul {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: space-around;
+        justify-content: space-around;
+        font-size: 22px;
+        color: #757575;
+        li {
+          ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            li {
+              flex-flow: 1;
+              width: 40px;
+              height: 40px;
+              text-align: center;
+              line-height: 48px;
+            }
+          }
+        }
+      }
+    }
+    .plus,
+    .minus,
+    .divide,
+    .multiply {
+      color: #ffffff;
+    }
+    .equal {
+      color: #e5a2a0;
+      background-color: #ffffff;
+      border-radius: 50%;
+      box-shadow: 1px 3px 11px 0px #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
 </style>
