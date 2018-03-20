@@ -140,12 +140,12 @@
       numberLegnth() {
         let message = this.msg
         let arr = String(this.msg).split('')
-        if (this.isStart) {
-          if (arr.indexOf('0') === 0) {
-            arr.splice(0, 1)
-          }
-          this.isStart = false
-        }
+        // if (this.isStart) {
+        //   if (arr.indexOf('0') === 0) {
+        //     arr.splice(0, 1)
+        //   }
+        //   this.isStart = false
+        // }
         for (let i = 0; i < arr.length; i++) {
           if (arr.indexOf('.') === -1) {
             if (i === 3 || i === 7) {
@@ -169,12 +169,28 @@
       press(key) {
         let val = key.value
         let className = key.className
-        if (this.numberLegnth.length === 11) { //限制最大输入长度
+
+        if (this.numberLegnth.length === 11 && !isNaN(val)) { //限制最大输入长度
+          return
+        }
+        if (val === 'C') { // 清空所有数据
+          this.msg = '0'
+          this.lastMsg = '0'
           return
         }
 
+        if (val === 'DEL') { // 退格
+          console.log(2, this.msg.length - 1)
+          this.msg = this.msg.substring(1, this.msg.length)
+          return
+        }
         if (!isNaN(val) || val === '.') { //输入的是数字或者小数点的情况
           this.isStart = true
+          if (this.isStart) {//第一次输入数字，要先把默认的0去掉
+            if (this.msg.indexOf('0') === 0) {
+              this.msg = this.msg.substring(1, this.msg.length)
+            }
+          }
           if (String(this.msg).indexOf('.') !== -1) { //输入内容已经有小数点
             if (val !== '.') { //如果输入不是点的情况，否则就没有输出
               this.msg += val
@@ -184,8 +200,12 @@
           }
         } else { //输入符号的情况
           if (val !== '=') { //是符号但不是等号的情况
+            if (!this.isStart) { //刚开始的时候不能输入符号
+              return
+            }
             this.lastMsg = this.numberLegnth + val //储存输入的数字和符号
             this.lastArr[this.lastArr.length] = this.lastMsg
+
             if (this.lastArr.length > 1) { //输入符号的时候也可以进行计算
               this.result = eval(this.lastArr[0] + this.numberLegnth)
               this.msg = String(this.result)
@@ -193,7 +213,6 @@
             } else {
               this.msg = '' //清屏
             }
-
           } else { //是等号的情况
             this.result = eval(this.lastMsg + this.numberLegnth)
             this.msg = String(this.result)
@@ -202,8 +221,8 @@
       },
       swipe(e) {
         let curClassName = this.$refs.whole.className
-        console.log(this.count,this.classNameArr.length)
-        if (this.count === this.classNameArr.length-1) {
+        console.log(this.count, this.classNameArr.length)
+        if (this.count === this.classNameArr.length - 1) {
           this.count = 0
         }
         this.count++
@@ -213,7 +232,6 @@
           }
       }
     },
-    created() {},
   }
 
 </script>
