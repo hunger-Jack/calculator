@@ -140,7 +140,7 @@
       numberLegnth() {
         let message = this.msg
         let arr = String(this.msg).split('')
-        if (arr.indexOf('.') === -1) { //如果有小数点的情况
+        if (arr.indexOf('.') === -1) { //如果没有有小数点的情况
           for (let i = 0; i < arr.length; i++) {
             if (i === 3 || i === 7) {
               arr.splice(1, 0, ',')
@@ -154,20 +154,19 @@
               arr.splice(i - 7, 0, ',')
             }
           }
-        } else {//输入小数点也可以自动补逗号
+        } else {//有小数点的情况，输入小数点也可以自动补逗号
           let dotIndex = message.indexOf('.')
           let leftNum = arr.slice(0, dotIndex)
           let leftLength = leftNum.length
           console.log(leftLength)
           if (leftLength > 3 && leftLength <= 6) {
-            
             arr.splice(leftLength - 3, 0, ',')
           } else if (leftLength > 6) {
             console.log(111111)
             arr.splice(leftLength - 6, 0, ',')
             arr.splice(leftLength - 2, 0, ',')
           } else {
-            return
+            return arr.splice(0, 11).join('')
           }
         }
         return arr.splice(0, 11).join('')
@@ -201,13 +200,15 @@
             if (!this.isStart) { //刚开始的时候不能输入符号
               return
             }
+            console.log(val)
             if (val === 'C') { // 清空所有数据,顺序很重要
               this.msg = '0'
               this.lastMsg = '0'
+              this.isStart = false
               return
             }
             if (val === 'DEL') { // 退格,顺序很重要
-              this.msg = this.msg.substring(1, this.msg.length)
+              this.msg = this.msg.substring(0, this.msg.length-1)
               return
             }
             this.lastMsg = this.numberLegnth + val //储存输入的数字和符号
