@@ -9,7 +9,7 @@
     </section>
     <section class="calc-input">
       <ul>
-        <li v-for="(item,index) in items" :key="index" :class="'row'+index">
+        <li v-for="(item,index) in items" :key="index">
           <ul>
             <li v-for="(key,index) in item" :key="index" :class="key.className" @touchstart="press(key)">
               {{key.value}}
@@ -140,14 +140,8 @@
       numberLegnth() {
         let message = this.msg
         let arr = String(this.msg).split('')
-        // if (this.isStart) {
-        //   if (arr.indexOf('0') === 0) {
-        //     arr.splice(0, 1)
-        //   }
-        //   this.isStart = false
-        // }
-        for (let i = 0; i < arr.length; i++) {
-          if (arr.indexOf('.') === -1) {
+        if (arr.indexOf('.') === -1) { //如果有小数点的情况
+          for (let i = 0; i < arr.length; i++) {
             if (i === 3 || i === 7) {
               arr.splice(1, 0, ',')
             }
@@ -160,7 +154,21 @@
               arr.splice(i - 7, 0, ',')
             }
           }
-
+        } else {//输入小数点也可以自动补逗号
+          let dotIndex = message.indexOf('.')
+          let leftNum = arr.slice(0, dotIndex)
+          let leftLength = leftNum.length
+          console.log(leftLength)
+          if (leftLength > 3 && leftLength <= 6) {
+            
+            arr.splice(leftLength - 3, 0, ',')
+          } else if (leftLength > 6) {
+            console.log(111111)
+            arr.splice(leftLength - 6, 0, ',')
+            arr.splice(leftLength - 2, 0, ',')
+          } else {
+            return
+          }
         }
         return arr.splice(0, 11).join('')
       }
@@ -173,20 +181,10 @@
         if (this.numberLegnth.length === 11 && !isNaN(val)) { //限制最大输入长度
           return
         }
-        if (val === 'C') { // 清空所有数据
-          this.msg = '0'
-          this.lastMsg = '0'
-          return
-        }
 
-        if (val === 'DEL') { // 退格
-          console.log(2, this.msg.length - 1)
-          this.msg = this.msg.substring(1, this.msg.length)
-          return
-        }
         if (!isNaN(val) || val === '.') { //输入的是数字或者小数点的情况
           this.isStart = true
-          if (this.isStart) {//第一次输入数字，要先把默认的0去掉
+          if (this.isStart) { //第一次输入数字，要先把默认的0去掉
             if (this.msg.indexOf('0') === 0) {
               this.msg = this.msg.substring(1, this.msg.length)
             }
@@ -203,9 +201,17 @@
             if (!this.isStart) { //刚开始的时候不能输入符号
               return
             }
+            if (val === 'C') { // 清空所有数据,顺序很重要
+              this.msg = '0'
+              this.lastMsg = '0'
+              return
+            }
+            if (val === 'DEL') { // 退格,顺序很重要
+              this.msg = this.msg.substring(1, this.msg.length)
+              return
+            }
             this.lastMsg = this.numberLegnth + val //储存输入的数字和符号
             this.lastArr[this.lastArr.length] = this.lastMsg
-
             if (this.lastArr.length > 1) { //输入符号的时候也可以进行计算
               this.result = eval(this.lastArr[0] + this.numberLegnth)
               this.msg = String(this.result)
@@ -220,16 +226,16 @@
         }
       },
       swipe(e) {
+        this.count++;
         let curClassName = this.$refs.whole.className
-        console.log(this.count, this.classNameArr.length)
-        if (this.count === this.classNameArr.length - 1) {
+        if (this.count === this.classNameArr.length) {
           this.count = 0
         }
-        this.count++
-          if (e.direction === 'Left' || e.direction === 'Right') {
-            this.$refs.whole.classList.remove(curClassName)
-            this.$refs.whole.classList.add(this.classNameArr[this.count])
-          }
+        if (e.direction === 'Left' || e.direction === 'Right') {
+          this.$refs.whole.classList.remove(curClassName)
+          this.$refs.whole.classList.add(this.classNameArr[this.count])
+        }
+
       }
     },
   }
@@ -244,7 +250,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 6px;
     .calc-display {
       border-bottom: 1px solid #eee;
       height: 40%;
@@ -325,7 +330,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 6px;
     .calc-display {
       border-bottom: 1px solid #eee;
       height: 40%;
@@ -406,7 +410,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 6px;
     .calc-display {
       border-bottom: 1px solid #eee;
       height: 40%;
@@ -487,7 +490,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 6px;
     .calc-display {
       border-bottom: 1px solid #eee;
       height: 40%;
