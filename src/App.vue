@@ -205,6 +205,7 @@
               this.msg = '0'
               this.lastMsg = '0'
               this.isStart = false
+              this.lastArr = []
               return
             }
             if (val === 'DEL') { // 退格,顺序很重要
