@@ -175,7 +175,7 @@
       press(key) {
         let val = key.value
         let className = key.className
-        if (val === 'C') { // 清空所有数据,顺序很重要
+        if (val === 'C') { // 清空所有数据,初始化所有数据
           this.msg = '0'
           this.lastMsg = '0'
           this.isStart = false
@@ -205,12 +205,15 @@
             this.msg += val
           }
         } else { //输入符号的情况
-          if (val !== '=') { //是符号但不是等号的情况
+          if (val === 'DEL') { // 退格,在输出结果之后不能退格
             if (!this.isStart) { //刚开始的时候不能输入符号
               return
             }
-            if (val === 'DEL') { // 退格,顺序很重要
-              this.msg = this.msg.substring(0, this.msg.length - 1)
+            this.msg = this.msg.substring(0, this.msg.length - 1)
+            return
+          }
+          if (val !== '=') { //是符号但不是等号的情
+            if (!this.isStart) { //刚开始的时候不能输入符号
               return
             }
             this.lastMsg = this.numberLegnth + val //储存输入的数字和符号
@@ -235,7 +238,7 @@
               this.result = eval(this.lastMsg + this.numberLegnth)
               this.resultRecord = this.result
               this.msg = String(this.result)
-            } else {//第二次求值，可以使用上一次求值结果直接计算
+            } else { //第二次求值，可以使用上一次求值结果直接计算
               this.result = eval(this.resultRecord + this.lastSymbol + this.numberLegnth)
               this.resultRecord = this.result
               this.msg = String(this.result)
