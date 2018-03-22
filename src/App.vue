@@ -28,7 +28,6 @@
       return {
         msg: '0',
         lastMsg: '0',
-        total: 0,
         isFirstPress: true,
         isBeginInputNum: true,
         result: 0,
@@ -37,6 +36,8 @@
         lastArr: [],
         classNameArr: ['theme-one', 'theme-two', 'theme-three', 'theme-four'],
         count: 0,
+        resultRecord: '',
+        lastSymbol: '',
         items: {
           row1: [{
               value: 'C',
@@ -137,7 +138,7 @@
       }
     },
     computed: {
-      numberLegnth() {
+      numberLegnth() { //自动添加逗号
         let message = this.msg
         let arr = String(this.msg).split('')
         if (arr.indexOf('.') === -1) { //如果没有有小数点的情况
@@ -154,15 +155,13 @@
               arr.splice(i - 7, 0, ',')
             }
           }
-        } else {//有小数点的情况，输入小数点也可以自动补逗号
+        } else { //有小数点的情况，输入小数点也可以自动补逗号
           let dotIndex = message.indexOf('.')
           let leftNum = arr.slice(0, dotIndex)
           let leftLength = leftNum.length
-          console.log(leftLength)
           if (leftLength > 3 && leftLength <= 6) {
             arr.splice(leftLength - 3, 0, ',')
           } else if (leftLength > 6) {
-            console.log(111111)
             arr.splice(leftLength - 6, 0, ',')
             arr.splice(leftLength - 2, 0, ',')
           } else {
@@ -176,12 +175,22 @@
       press(key) {
         let val = key.value
         let className = key.className
-
+        if (val === 'C') { // 清空所有数据,顺序很重要
+          this.msg = '0'
+          this.lastMsg = '0'
+          this.isStart = false
+          this.lastArr = []
+          this.resultRecord = ''
+          this.result = 0
+          return
+        }
         if (this.numberLegnth.length === 11 && !isNaN(val)) { //限制最大输入长度
           return
         }
-
         if (!isNaN(val) || val === '.') { //输入的是数字或者小数点的情况
+          if (!this.isStart) { // 如果没有开始，就把msg还原
+            this.msg = '0'
+          }
           this.isStart = true
           if (this.isStart) { //第一次输入数字，要先把默认的0去掉
             if (this.msg.indexOf('0') === 0) {
@@ -200,34 +209,43 @@
             if (!this.isStart) { //刚开始的时候不能输入符号
               return
             }
-            console.log(val)
-            if (val === 'C') { // 清空所有数据,顺序很重要
-              this.msg = '0'
-              this.lastMsg = '0'
-              this.isStart = false
-              this.lastArr = []
-              return
-            }
             if (val === 'DEL') { // 退格,顺序很重要
-              this.msg = this.msg.substring(0, this.msg.length-1)
+              this.msg = this.msg.substring(0, this.msg.length - 1)
               return
             }
             this.lastMsg = this.numberLegnth + val //储存输入的数字和符号
             this.lastArr[this.lastArr.length] = this.lastMsg
-            if (this.lastArr.length > 1) { //输入符号的时候也可以进行计算
-              this.result = eval(this.lastArr[0] + this.numberLegnth)
-              this.msg = String(this.result)
-              this.lastArr = []
+            if (this.lastArr.length > 1) { //第二次输入符号的时候也可以进行计算
+              if (this.resultRecord === '') { //第一次求值的情况
+                this.result = eval(this.lastArr[this.lastArr.length - 2] + this.numberLegnth)
+                this.resultRecord = this.result
+                this.msg = String(this.result)
+              } else { //第二次求值，可以使用上一次求值结果直接计算
+                this.result = eval(this.resultRecord + this.lastSymbol + this.numberLegnth)
+                this.resultRecord = this.result
+                this.msg = String(this.result)
+              }
+              this.lastSymbol = val //储存上一个符号
+              this.isStart = false
             } else {
               this.msg = '' //清屏
             }
           } else { //是等号的情况
-            this.result = eval(this.lastMsg + this.numberLegnth)
-            this.msg = String(this.result)
+            if (this.resultRecord === '') { //第一次求值的情况
+              this.result = eval(this.lastMsg + this.numberLegnth)
+              this.resultRecord = this.result
+              this.msg = String(this.result)
+            } else {//第二次求值，可以使用上一次求值结果直接计算
+              this.result = eval(this.resultRecord + this.lastSymbol + this.numberLegnth)
+              this.resultRecord = this.result
+              this.msg = String(this.result)
+            }
+            this.lastArr = [] //点击等于号之后清除lastArr，还原状态
+            this.resultRecord = '' //点击等于号之后清除resultRecord，还原状态
           }
         }
       },
-      swipe(e) {
+      swipe(e) { // 左右滑动切换背景
         this.count++;
         let curClassName = this.$refs.whole.className
         if (this.count === this.classNameArr.length) {
@@ -239,21 +257,30 @@
         }
       }
     },
+    watch: {
+      msg(val) { //检测msg的变化，如果为空的情况下，只能输入数字，相当于重置
+        if (val === '') {
+          this.isStart = false
+        }
+      }
+    }
   }
 
 </script>
 
 <style <style lang="less">
-body,html {
-  height: 100%;
-}
+  body,
+  html {
+    height: 100%;
+  }
+
   .theme-one {
     position: fixed;
-    top:0;
+    top: 0;
     bottom: 0;
     right: 0;
     left: 0;
-    bottomng: 16px 24px 8px 24px;
+    padding: 16px 24px 8px 24px;
     background-color: white;
     display: flex;
     flex-direction: column;
