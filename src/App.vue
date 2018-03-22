@@ -237,7 +237,6 @@
           this.$refs.whole.classList.remove(curClassName)
           this.$refs.whole.classList.add(this.classNameArr[this.count])
         }
-
       }
     },
   }
@@ -245,11 +244,17 @@
 </script>
 
 <style <style lang="less">
+body,html {
+  height: 100%;
+}
   .theme-one {
-    height: 100vh;
-    padding: 16px 24px 8px 24px;
+    position: fixed;
+    top:0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    bottomng: 16px 24px 8px 24px;
     background-color: white;
-    width: 100%;
     display: flex;
     flex-direction: column;
     .calc-display {
@@ -326,7 +331,11 @@
   }
 
   .theme-two {
-    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
     padding: 16px 24px 8px 24px;
     background-color: #414141;
     width: 100%;
@@ -406,7 +415,11 @@
   }
 
   .theme-three {
-    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
     padding: 16px 24px 8px 24px;
     background-color: #f06e6e;
     width: 100%;
@@ -486,7 +499,11 @@
   }
 
   .theme-four {
-    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
     padding: 16px 24px 8px 24px;
     background-color: #b8e986;
     width: 100%;
