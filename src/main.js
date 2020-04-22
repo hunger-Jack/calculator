@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import '@/assets/reset.css'
 import AlloyFinger from 'alloyfinger'
-import AlloyFingerPlugin from 'alloyfinger/vue/alloy_finger.vue'
+import AlloyFingerPlugin from 'alloyfinger/vue/alloy_finger_vue'
 Vue.use(AlloyFingerPlugin, {
   AlloyFinger
 })

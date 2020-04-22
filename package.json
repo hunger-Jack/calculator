@@ -10,8 +10,9 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "alloyfinger": "^0.1.13",
-    "vue": "^2.5.2"
+    "alloyfinger": "^0.1.16",
+    "vue": "^2.5.2",
+    "vue-finger": "^0.1.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
